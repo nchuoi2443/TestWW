@@ -2,11 +2,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using UnityEngine;
+using UnityEngine.Analytics;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance;
+
     public event Action<eStateGame> StateChangedAction = delegate { };
+
+    
 
     public enum eLevelMode
     {
@@ -21,13 +27,14 @@ public class GameManager : MonoBehaviour
         GAME_STARTED,
         PAUSE,
         GAME_OVER,
+        GAME_WIN,
     }
 
     private eStateGame m_state;
     public eStateGame State
     {
         get { return m_state; }
-        private set
+        set
         {
             m_state = value;
 
@@ -41,12 +48,25 @@ public class GameManager : MonoBehaviour
 
     private BoardController m_boardController;
 
+    //test, xóa sau
+    private BottomCell m_bottomCell;
+
     private UIMainManager m_uiMenu;
 
     private LevelCondition m_levelCondition;
 
+    public GameObject UIGameOver;
+
+    public GameObject UIGameWin;
+
+    public eLevelMode CurrentGameMode { get; private set; }
     private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+
         State = eStateGame.SETUP;
 
         m_gameSettings = Resources.Load<GameSettings>(Constants.GAME_SETTINGS_PATH);
@@ -83,8 +103,11 @@ public class GameManager : MonoBehaviour
 
     public void LoadLevel(eLevelMode mode)
     {
+        m_bottomCell = new GameObject("BottomCell").AddComponent<BottomCell>();
+        m_bottomCell = new BottomCell(m_bottomCell.transform, m_gameSettings);
+
         m_boardController = new GameObject("BoardController").AddComponent<BoardController>();
-        m_boardController.StartGame(this, m_gameSettings);
+        m_boardController.StartGame(this, m_gameSettings, m_bottomCell);
 
         if (mode == eLevelMode.MOVES)
         {
@@ -99,7 +122,24 @@ public class GameManager : MonoBehaviour
 
         m_levelCondition.ConditionCompleteEvent += GameOver;
 
+        CurrentGameMode = mode;
         State = eStateGame.GAME_STARTED;
+    }
+
+    public IEnumerator Win()
+    {
+        yield return new WaitForSeconds(1f);
+
+        UIGameWin.SetActive(true);
+        State = eStateGame.GAME_OVER;
+    }
+
+    public IEnumerator GameLoss()
+    {
+        yield return new WaitForSeconds(1f);
+
+        UIGameOver.SetActive(true);
+        State = eStateGame.GAME_OVER;
     }
 
     public void GameOver()

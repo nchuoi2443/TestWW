@@ -33,7 +33,7 @@ public class Item
         Cell = cell;
     }
 
-    internal void AnimationMoveToPosition()
+    public void AnimationMoveToPosition()
     {
         if (View == null) return;
 
@@ -94,11 +94,12 @@ public class Item
         return false;
     }
 
+   
     internal virtual void ExplodeView()
     {
         if (View)
         {
-            View.DOScale(0.1f, 0.1f).OnComplete(
+            View.DOScale(0.1f, 0.5f).OnComplete(
                 () =>
                 {
                     GameObject.Destroy(View.gameObject);

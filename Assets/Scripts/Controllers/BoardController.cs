@@ -13,9 +13,13 @@ public class BoardController : MonoBehaviour
 
     private Board m_board;
 
+    private BottomCell m_bottomCell;
+
     private GameManager m_gameManager;
 
     private bool m_isDragging;
+
+    private bool m_isClicked;
 
     private Camera m_cam;
 
@@ -31,15 +35,19 @@ public class BoardController : MonoBehaviour
 
     private bool m_gameOver;
 
-    public void StartGame(GameManager gameManager, GameSettings gameSettings)
+    public void StartGame(GameManager gameManager, GameSettings gameSettings, BottomCell bottomCell)
     {
         m_gameManager = gameManager;
 
         m_gameSettings = gameSettings;
 
+        m_bottomCell = bottomCell;
+
         m_gameManager.StateChangedAction += OnGameStateChange;
 
         m_cam = Camera.main;
+
+        m_isClicked = false;
 
         m_board = new Board(this.transform, gameSettings);
 
@@ -49,7 +57,7 @@ public class BoardController : MonoBehaviour
     private void Fill()
     {
         m_board.Fill();
-        FindMatchesAndCollapse();
+        //FindMatchesAndCollapse();
     }
 
     private void OnGameStateChange(GameManager.eStateGame state)
@@ -64,7 +72,7 @@ public class BoardController : MonoBehaviour
                 break;
             case GameManager.eStateGame.GAME_OVER:
                 m_gameOver = true;
-                StopHints();
+                //StopHints();
                 break;
         }
     }
@@ -75,23 +83,16 @@ public class BoardController : MonoBehaviour
         if (m_gameOver) return;
         if (IsBusy) return;
 
-        if (!m_hintIsShown)
-        {
-            m_timeAfterFill += Time.deltaTime;
-            if (m_timeAfterFill > m_gameSettings.TimeForHint)
-            {
-                m_timeAfterFill = 0f;
-                ShowHint();
-            }
-        }
-
         if (Input.GetMouseButtonDown(0))
         {
             var hit = Physics2D.Raycast(m_cam.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-            if (hit.collider != null)
+            if (hit.collider != null && !m_isClicked)
             {
-                m_isDragging = true;
-                m_hitCollider = hit.collider;
+                /*m_isDragging = true;
+                m_hitCollider = hit.collider;*/
+
+                m_bottomCell.AddCell(hit.collider.GetComponent<Cell>());
+                m_isClicked = true;
             }
         }
 
@@ -100,41 +101,13 @@ public class BoardController : MonoBehaviour
             ResetRayCast();
         }
 
-        if (Input.GetMouseButton(0) && m_isDragging)
-        {
-            var hit = Physics2D.Raycast(m_cam.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-            if (hit.collider != null)
-            {
-                if (m_hitCollider != null && m_hitCollider != hit.collider)
-                {
-                    StopHints();
-
-                    Cell c1 = m_hitCollider.GetComponent<Cell>();
-                    Cell c2 = hit.collider.GetComponent<Cell>();
-                    if (AreItemsNeighbor(c1, c2))
-                    {
-                        IsBusy = true;
-                        SetSortingLayer(c1, c2);
-                        m_board.Swap(c1, c2, () =>
-                        {
-                            FindMatchesAndCollapse(c1, c2);
-                        });
-
-                        ResetRayCast();
-                    }
-                }
-            }
-            else
-            {
-                ResetRayCast();
-            }
-        }
     }
 
     private void ResetRayCast()
     {
         m_isDragging = false;
         m_hitCollider = null;
+        m_isClicked = false;
     }
 
     private void FindMatchesAndCollapse(Cell cell1, Cell cell2)
@@ -195,7 +168,8 @@ public class BoardController : MonoBehaviour
             else
             {
                 //StartCoroutine(RefillBoardCoroutine());
-                StartCoroutine(ShuffleBoardCoroutine());
+                
+                //StartCoroutine(ShuffleBoardCoroutine());
             }
         }
     }
@@ -232,6 +206,7 @@ public class BoardController : MonoBehaviour
         StartCoroutine(ShiftDownItemsCoroutine());
     }
 
+    //use to collapse items after matches
     private IEnumerator ShiftDownItemsCoroutine()
     {
         m_board.ShiftDownItems();
@@ -242,7 +217,7 @@ public class BoardController : MonoBehaviour
 
         yield return new WaitForSeconds(0.2f);
 
-        FindMatchesAndCollapse();
+        //FindMatchesAndCollapse();
     }
 
     private IEnumerator RefillBoardCoroutine()

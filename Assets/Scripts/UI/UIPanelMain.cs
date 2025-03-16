@@ -6,9 +6,10 @@ using UnityEngine.UI;
 
 public class UIPanelMain : MonoBehaviour, IMenu
 {
-    [SerializeField] private Button btnTimer;
+    //[SerializeField] private Button btnTimer;
 
     [SerializeField] private Button btnMoves;
+    [SerializeField] private Button btnTimer;
 
     private UIMainManager m_mngr;
 

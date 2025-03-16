@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NormalItem : Item
-{
     public enum eNormalType
     {
         TYPE_ONE,
@@ -14,6 +12,9 @@ public class NormalItem : Item
         TYPE_SIX,
         TYPE_SEVEN
     }
+
+public class NormalItem : Item
+{
 
     public eNormalType ItemType;
 

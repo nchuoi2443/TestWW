@@ -17,13 +17,25 @@ public class Cell : MonoBehaviour
 
     public Cell NeighbourLeft { get; set; }
 
+    public bool CellStatus { get; set; }
 
-    public bool IsEmpty => Item == null;
+    public NormalItem NormalItemInCell { get; set; }
+
+    public bool IsEmpty => NormalItemInCell == null;
+
+    private readonly Vector3 _iniPosition;
+    public Vector3 IniPosition => _iniPosition;
+
+    public Cell()
+    {
+        _iniPosition = new Vector3();
+    }
 
     public void Setup(int cellX, int cellY)
     {
         this.BoardX = cellX;
         this.BoardY = cellY;
+        _iniPosition.Set(transform.position.x, transform.position.y, transform.position.z);
     }
 
     public bool IsNeighbour(Cell other)
@@ -68,6 +80,7 @@ public class Cell : MonoBehaviour
         return Item != null && other.Item != null && Item.IsSameType(other.Item);
     }
 
+    //this use for explode one item when it get 3 cells
     internal void ExplodeItem()
     {
         if (Item == null) return;

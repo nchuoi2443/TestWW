@@ -74,6 +74,16 @@ public class Board
 
     internal void Fill()
     {
+        Dictionary<eNormalType, int> typeCounts = new Dictionary<eNormalType, int>();
+        foreach (eNormalType type in Enum.GetValues(typeof(eNormalType)))
+        {
+            typeCounts[type] = 0;
+        }
+
+        List<eNormalType> allTypes = Enum.GetValues(typeof(eNormalType)).Cast<eNormalType>().ToList();
+        int totalCells = boardSizeX * boardSizeY;
+        int typesCount = allTypes.Count;
+
         for (int x = 0; x < boardSizeX; x++)
         {
             for (int y = 0; y < boardSizeY; y++)
@@ -81,7 +91,7 @@ public class Board
                 Cell cell = m_cells[x, y];
                 NormalItem item = new NormalItem();
 
-                List<NormalItem.eNormalType> types = new List<NormalItem.eNormalType>();
+                List<eNormalType> types = new List<eNormalType>();
                 if (cell.NeighbourBottom != null)
                 {
                     NormalItem nitem = cell.NeighbourBottom.Item as NormalItem;
@@ -100,15 +110,54 @@ public class Board
                     }
                 }
 
-                item.SetType(Utils.GetRandomNormalTypeExcept(types.ToArray()));
+                eNormalType selectedType = GetRandomNormalTypeExceptWithCount(types.ToArray(), typeCounts, totalCells, typesCount);
+                item.SetType(selectedType);
                 item.SetView();
                 item.SetViewRoot(m_root);
 
+                cell.NormalItemInCell = item;
                 cell.Assign(item);
                 cell.ApplyItemPosition(false);
+
+                typeCounts[selectedType]++;
             }
         }
+
+
     }
+
+    private eNormalType GetRandomNormalTypeExceptWithCount(eNormalType[] types, Dictionary<eNormalType, int> typeCounts, int totalCells, int typesCount)
+    {
+        List<eNormalType> availableTypes = Enum.GetValues(typeof(eNormalType))
+            .Cast<eNormalType>()
+            .Where(type => (typeCounts[type] % 3 != 0 || typeCounts[type] == 0)) 
+            .OrderBy(type => types.Contains(type) ? 1 : 0) 
+            .ToList();
+
+        if (availableTypes.Count == 0)
+        {
+            availableTypes = Enum.GetValues(typeof(eNormalType))
+                .Cast<eNormalType>()
+                .Except(types)
+                .ToList();
+        }
+
+        foreach (var type in availableTypes.ToList())
+        {
+            if (typeCounts[type] + 1 > (totalCells / typesCount) * 3)
+            {
+                availableTypes.Remove(type);
+            }
+        }
+
+        int rnd = UnityEngine.Random.Range(0, availableTypes.Count);
+        return availableTypes[rnd];
+    }
+
+
+
+
+
 
     internal void Shuffle()
     {
