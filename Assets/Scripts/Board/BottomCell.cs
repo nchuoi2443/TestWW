@@ -72,7 +72,7 @@ public class BottomCell : MonoBehaviour
 
     public void AddCell(Cell cell)
     {
-        if (cell.NormalItemInCell == null) return;
+        
         for (int i = 0; i < bottomCellX; i++)
         {
             if (m_cell[i].NormalItemInCell == cell.NormalItemInCell && m_gameManager.CurrentGameMode == GameManager.eLevelMode.MOVES)
@@ -93,6 +93,7 @@ public class BottomCell : MonoBehaviour
             if (m_cellStatus[i] == false)
             {
                 
+                if (cell.NormalItemInCell == null) return;
                 cell.NormalItemInCell.View.DOMove(m_cell[i].transform.position, 0.2f).onComplete = () =>
                 {
                     FindMatchAndCollapse();

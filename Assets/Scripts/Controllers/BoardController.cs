@@ -90,9 +90,11 @@ public class BoardController : MonoBehaviour
             {
                 /*m_isDragging = true;
                 m_hitCollider = hit.collider;*/
-                if (hit.collider.GetComponent<Cell>().NormalItemInCell.View == null) return;
+                Cell cell = hit.collider.GetComponent<Cell>();
+                if (cell.NormalItemInCell != null)
+                    if (cell.NormalItemInCell.View == null) return;
 
-                m_bottomCell.AddCell(hit.collider.GetComponent<Cell>());
+                m_bottomCell.AddCell(cell);
                 m_isClicked = true;
             }
         }
