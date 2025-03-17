@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.TextCore.LowLevel;
 
 public class Board
 {
@@ -153,10 +154,6 @@ public class Board
         int rnd = UnityEngine.Random.Range(0, availableTypes.Count);
         return availableTypes[rnd];
     }
-
-
-
-
 
 
     internal void Shuffle()

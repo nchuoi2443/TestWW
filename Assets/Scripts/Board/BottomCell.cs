@@ -72,6 +72,7 @@ public class BottomCell : MonoBehaviour
 
     public void AddCell(Cell cell)
     {
+        if (cell.NormalItemInCell == null) return;
         for (int i = 0; i < bottomCellX; i++)
         {
             if (m_cell[i].NormalItemInCell == cell.NormalItemInCell && m_gameManager.CurrentGameMode == GameManager.eLevelMode.MOVES)
@@ -91,6 +92,7 @@ public class BottomCell : MonoBehaviour
         {
             if (m_cellStatus[i] == false)
             {
+                
                 cell.NormalItemInCell.View.DOMove(m_cell[i].transform.position, 0.2f).onComplete = () =>
                 {
                     FindMatchAndCollapse();
@@ -205,42 +207,42 @@ public class BottomCell : MonoBehaviour
 
 
         }
+   
+    }
 
-
-
-        int GetIndexOfNormalItem(List<NormalItem> items, NormalItem itemInlist)
+    int GetIndexOfNormalItem(List<NormalItem> items, NormalItem itemInlist)
+    {
+        for (int i = 0; i < items.Count; i++)
         {
-            for (int i = 0; i < items.Count; i++)
+            if (items[i].ItemType == itemInlist.ItemType)
             {
-                if (items[i].ItemType == itemInlist.ItemType)
-                {
-                    return i;
-                }
+                return i;
             }
-            return -1;
         }
+        return -1;
+    }
 
-        void AddItemsIntolist(ref eNormalType[] eNormal, ref List<NormalItem> items)
+    void AddItemsIntolist(ref eNormalType[] eNormal, ref List<NormalItem> items)
+    {
+        for (int i = 0; i < 3; i++)
         {
-            for (int i = 0; i < 3; i++)
-            {
 
-                if (m_cell[i].NormalItemInCell != null && i == 0)
-                {
-                    eNormal[i] = m_cell[i].NormalItemInCell.ItemType;
-                    items.Add(m_cell[i].NormalItemInCell);
-                }
-                else if (m_cell[i].NormalItemInCell != null && m_cell[i].NormalItemInCell.ItemType != eNormal[i - 1] && i == 1)
-                {
-                    eNormal[i] = m_cell[i].NormalItemInCell.ItemType;
-                    items.Add(m_cell[i].NormalItemInCell);
-                }
-                else if (m_cell[i].NormalItemInCell != null && m_cell[i].NormalItemInCell.ItemType != eNormal[i - 1] && m_cell[i].NormalItemInCell.ItemType != eNormal[i - 2] && i == 2)
-                {
-                    eNormal[i] = m_cell[i].NormalItemInCell.ItemType;
-                    items.Add(m_cell[i].NormalItemInCell);
-                }
+            if (m_cell[i].NormalItemInCell != null && i == 0)
+            {
+                eNormal[i] = m_cell[i].NormalItemInCell.ItemType;
+                items.Add(m_cell[i].NormalItemInCell);
+            }
+            else if (m_cell[i].NormalItemInCell != null && m_cell[i].NormalItemInCell.ItemType != eNormal[i - 1] && i == 1)
+            {
+                eNormal[i] = m_cell[i].NormalItemInCell.ItemType;
+                items.Add(m_cell[i].NormalItemInCell);
+            }
+            else if (m_cell[i].NormalItemInCell != null && m_cell[i].NormalItemInCell.ItemType != eNormal[i - 1] && m_cell[i].NormalItemInCell.ItemType != eNormal[i - 2] && i == 2)
+            {
+                eNormal[i] = m_cell[i].NormalItemInCell.ItemType;
+                items.Add(m_cell[i].NormalItemInCell);
             }
         }
     }
+
 }

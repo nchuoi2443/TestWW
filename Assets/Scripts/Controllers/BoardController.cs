@@ -90,6 +90,7 @@ public class BoardController : MonoBehaviour
             {
                 /*m_isDragging = true;
                 m_hitCollider = hit.collider;*/
+                if (hit.collider.GetComponent<Cell>().NormalItemInCell.View == null) return;
 
                 m_bottomCell.AddCell(hit.collider.GetComponent<Cell>());
                 m_isClicked = true;
@@ -102,6 +103,7 @@ public class BoardController : MonoBehaviour
         }
 
     }
+
 
     private void ResetRayCast()
     {
